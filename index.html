@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>“山海计划”结业回访问卷</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
+    </script>
+    <style>
+        /* 样式与之前完全一致，为节省篇幅此处省略，实际请保留完整样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1e2a3a;
+            padding: 30px 20px;
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            color: #0a2540;
+            border-bottom: 4px solid #1a73e8;
+            padding-bottom: 16px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 15px;
+            color: #6b7a8f;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #e9edf4;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0a2540;
+            margin-bottom: 6px;
+        }
+        .section-desc {
+            font-size: 14px;
+            color: #6b7a8f;
+            margin-bottom: 14px;
+        }
+        .q-item {
+            margin-bottom: 24px;
+            padding: 16px 18px;
+            background: #fafcff;
+            border-radius: 10px;
+            border: 1px solid #eef2f7;
+            position: relative;
+        }
+        .q-item .required-star {
+            color: #c62828;
+            margin-left: 2px;
+            font-weight: 700;
+        }
+        .q-label {
+            font-weight: 500;
+            font-size: 15px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .q-label .q-num {
+            color: #1a73e8;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 24px;
+            margin-top: 4px;
+        }
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .options input[type="radio"],
+        .options input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1a73e8;
+            flex-shrink: 0;
+        }
+        .sub-q {
+            margin-top: 8px;
+            padding-left: 4px;
+            display: none;
+        }
+        .sub-q.show {
+            display: block;
+        }
+        .sub-q textarea,
+        .sub-q input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dce3ec;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fff;
+            transition: border 0.2s;
+        }
+        .sub-q textarea:focus,
+        .sub-q input[type="text"]:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.10);
+        }
+        .sub-q textarea {
+            min-height: 48px;
+            resize: vertical;
+        }
+        .sub-q .hint {
+            font-size: 13px;
+            color: #6b7a8f;
+            margin-bottom: 4px;
+        }
+        .sub-q .required-hint {
+            font-size: 12px;
+            color: #c62828;
+            margin-top: 4px;
+            display: none;
+        }
+        .sub-q .required-hint.show {
+            display: block;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 36px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #eef3fc;
+            color: #1e2a3a;
+        }
+        .btn:hover {
+            background: #d4e0f0;
+        }
+        .btn-primary {
+            background: #1a73e8;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #1557b0;
+        }
+        .btn-success {
+            background: #2a7d4f;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #1e5f3a;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #dce3ec;
+        }
+        .btn-outline:hover {
+            background: #f0f4fa;
+        }
+
+        .footnote {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #6b7a8f;
+            text-align: center;
+            border-top: 1px solid #e9edf4;
+            padding-top: 16px;
+        }
+        .success-box {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .success-box .icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+        }
+        .success-box h2 {
+            font-size: 22px;
+            color: #2a7d4f;
+            margin-bottom: 8px;
+        }
+        .success-box p {
+            color: #6b7a8f;
+            font-size: 15px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .region-selector {
+            background: #f0f7ff;
+            border: 2px solid #d4e0f0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .region-selector .options {
+            gap: 16px 30px;
+        }
+        .region-selector .options label {
+            font-weight: 500;
+        }
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .report-header h2 {
+            font-size: 20px;
+            color: #0a2540;
+            border-left: 4px solid #1a73e8;
+            padding-left: 12px;
+        }
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .report-stat-card {
+            background: #f0f5fe;
+            border-radius: 10px;
+            padding: 14px 16px;
+            text-align: center;
+            display: inline-block;
+            min-width: 120px;
+        }
+        .report-stat-card .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a73e8;
+        }
+        .report-stat-card .label {
+            font-size: 13px;
+            color: #6b7a8f;
+        }
+        .report-stat-card.green .num {
+            color: #2a7d4f;
+        }
+        .report-stat-card.orange .num {
+            color: #e67e22;
+        }
+        .report-table-wrap {
+            overflow-x: auto;
+            margin: 16px 0 24px 0;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            min-width: 700px;
+        }
+        .report-table th {
+            background: #1a2b3c;
+            color: #fff;
+            padding: 8px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12.5px;
+            white-space: nowrap;
+        }
+        .report-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #eaeef5;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .dim-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 16px 0 20px 0;
+        }
+        .dim-card {
+            background: #f8faff;
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+            border: 1px solid #eef2f7;
+        }
+        .dim-card .dim-name {
+            font-size: 13px;
+            color: #6b7a8f;
+        }
+        .dim-card .dim-rate {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0a2540;
+        }
+        .rating-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .rating-badge.excellent {
+            background: #e6f7e6;
+            color: #2a7d4f;
+        }
+        .rating-badge.good {
+            background: #e8f0fe;
+            color: #1a5a9c;
+        }
+        .rating-badge.pass {
+            background: #fff3e0;
+            color: #b76e1e;
+        }
+        .rating-badge.fail {
+            background: #fee9e7;
+            color: #c62828;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px 36px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        .modal-box h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .modal-box p {
+            font-size: 14px;
+            color: #6b7a8f;
+            margin-bottom: 16px;
+        }
+        .modal-box input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        .modal-box input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+        .modal-box .btn-row {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        @media (max-width:600px) {
+            .container {
+                padding: 20px 16px;
+            }
+            .options {
+                gap: 6px 12px;
+            }
+            .options label {
+                font-size: 13px;
+            }
+            .q-item {
+                padding: 12px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- 问卷页 -->
+        <div id="pageSurvey">
+            <h1>“山海计划”结业回访问卷</h1>
+            <div class="subtitle">感谢您全程参与“山海计划”培训项目。为及时了解您的真实感受和意见建议，以便我们持续优化培训工作，请您如实填写以下回访问卷。<br>本问卷采用匿名方式，所有反馈仅用于培训质量改进，不涉及对您个人的任何评价。</div>
+            <form id="surveyForm">
+                <!-- 地区 -->
+                <div class="section" style="margin-top:0;padding-top:0;border-top:none;">
+                    <div class="q-item region-selector">
+                        <span class="q-label"><span class="q-num">0.</span> 您来自哪个地区？<span class="required-star">*</span></span>
+                        <div class="options">
+                            <label><input type="radio" name="region" value="中国大陆">中国大陆</label>
+                            <label><input type="radio" name="region" value="中国香港">中国香港</label>
+                            <label><input type="radio" name="region" value="几内亚">几内亚</label>
+                            <label><input type="radio" name="region" value="澳大利亚">澳大利亚</label>
+                            <label><input type="radio" name="region" value="新加坡">新加坡</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 维度一 -->
+                <div class="section">
+                    <div class="section-title">维度一：理解变化</div>
+                    <div class="section-desc">以下题目想了解您对宝武战略、自身角色定位以及跨文化合作的理解是否发生了变化。</div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">1.1</span> 返岗后，您是否曾在工作交流中（含正式会议、非正式沟通）主动运用或提及培训中学到的战略框架、概念或案例？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q1_1">
+                            <label><input type="radio" name="q1_1" value="多次运用" data-show-example="true">是，多次运用</label>
+                            <label><input type="radio" name="q1_1" value="有过1-2次" data-show-example="true">是，有过1-2次</label>
+                            <label><input type="radio" name="q1_1" value="有过想法但未运用" data-show-example="true">有过想法，但尚未在实际交流中运用</label>
+                            <label><input type="radio" name="q1_1" value="否" data-show-example="false">否</label>
+                        </div>
+                        <div class="sub-q" id="sub_q1_1">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q1_1_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q1_1">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">1.2</span> 与培训前相比，您对自身岗位与宝武整体战略之间关系的理解是否有变化？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q1_2">
+                            <label><input type="radio" name="q1_2" value="显著变化" data-show-example="true">有显著变化，理解更加清晰和深入</label>
+                            <label><input type="radio" name="q1_2" value="有一定变化" data-show-example="true">有一定变化，比培训前更清楚</label>
+                            <label><input type="radio" name="q1_2" value="变化不大" data-show-example="true">变化不大，基本与培训前持平</label>
+                            <label><input type="radio" name="q1_2" value="没有变化" data-show-example="false">没有变化</label>
+                        </div>
+                        <div class="sub-q" id="sub_q1_2">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q1_2_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q1_2">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">1.3</span> 与培训前相比，您在处理跨文化合作时的心态和看法是否有变化？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q1_3">
+                            <label><input type="radio" name="q1_3" value="明显变化" data-show-example="true">有明显变化，态度更加积极和开放</label>
+                            <label><input type="radio" name="q1_3" value="有一定变化" data-show-example="true">有一定变化，但面对具体困难时仍会有顾虑</label>
+                            <label><input type="radio" name="q1_3" value="变化不大" data-show-example="true">变化不大，基本与培训前持平</label>
+                            <label><input type="radio" name="q1_3" value="没有变化" data-show-example="false">没有变化</label>
+                        </div>
+                        <div class="sub-q" id="sub_q1_3">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q1_3_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q1_3">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">1.4</span> 请举一个具体的例子，说明您对宝武战略、自身角色定位以及跨文化合作的理解发生了怎样的变化：<span class="required-star">*</span></span>
+                        <div class="sub-q" style="display:block;"><textarea name="q1_4" placeholder="请描述具体案例…" style="min-height:60px;"></textarea></div>
+                    </div>
+                </div>
+
+                <!-- 维度二 -->
+                <div class="section">
+                    <div class="section-title">维度二：行为变化</div>
+                    <div class="section-desc">以下题目想了解您在实际工作中的行为方式是否发生了可观察的改变。</div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">2.1</span> 返岗后，在与中方/外方同事沟通时，您是否会有意识地调整沟通方式？（例如：调整语速、注意文化习惯、确认理解等）<span class="required-star">*</span></span>
+                        <div class="options" data-target="q2_1">
+                            <label><input type="radio" name="q2_1" value="经常调整" data-show-example="true">经常有意识地调整</label>
+                            <label><input type="radio" name="q2_1" value="偶尔调整" data-show-example="true">偶尔会有意识地调整</label>
+                            <label><input type="radio" name="q2_1" value="想过但未做" data-show-example="true">想过要调整，但实际做的时候还是按习惯来</label>
+                            <label><input type="radio" name="q2_1" value="没有调整过" data-show-example="false">没有特别调整过</label>
+                        </div>
+                        <div class="sub-q" id="sub_q2_1">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q2_1_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q2_1">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">2.2</span> 返岗后，您是否主动与培训中结识的其他地区同事建立了工作联系？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q2_2">
+                            <label><input type="radio" name="q2_2" value="实质工作联系" data-show-example="true">是，建立了实质性的工作联系（如项目协作、信息共享等）</label>
+                            <label><input type="radio" name="q2_2" value="友好联系" data-show-example="true">是，保持了友好联系（如问候、日常聊天等），但尚无具体工作协作</label>
+                            <label><input type="radio" name="q2_2" value="计划联系" data-show-example="true">计划联系但尚未行动</label>
+                            <label><input type="radio" name="q2_2" value="尚未建立联系" data-show-example="false">尚未建立联系</label>
+                        </div>
+                        <div class="sub-q" id="sub_q2_2">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q2_2_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q2_2">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">2.3</span> 返岗后，您是否在团队内部或跨团队协作中，主动承担过跨文化协调角色（即帮助不同文化背景的同事沟通协作）？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q2_3">
+                            <label><input type="radio" name="q2_3" value="多次主动承担" data-show-example="true">是，多次主动承担</label>
+                            <label><input type="radio" name="q2_3" value="有过1-2次" data-show-example="true">是，有过1-2次</label>
+                            <label><input type="radio" name="q2_3" value="有过机会未承担" data-show-example="true">有过机会但未主动承担</label>
+                            <label><input type="radio" name="q2_3" value="没有遇到过机会" data-show-example="false">没有遇到过这样的机会</label>
+                        </div>
+                        <div class="sub-q" id="sub_q2_3">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q2_3_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q2_3">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">2.4</span> 请描述您在返岗后最明显的一个行为变化（例如：原来怎么做，现在怎么做）：<span class="required-star">*</span></span>
+                        <div class="sub-q" style="display:block;"><textarea name="q2_4" placeholder="请描述具体行为变化…" style="min-height:60px;"></textarea></div>
+                    </div>
+                </div>
+
+                <!-- 维度三 -->
+                <div class="section">
+                    <div class="section-title">维度三：工作产出变化</div>
+                    <div class="section-desc">以下题目想了解您的实际工作成果是否因培训而发生了优化。</div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">3.1</span> 返岗后，您是否尝试将培训中学到的方法或工具（如AI工具、跨文化沟通方法等）应用到实际工作中？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q3_1">
+                            <label><input type="radio" name="q3_1" value="已尝试并持续使用" data-show-example="true">是，已尝试并将持续使用</label>
+                            <label><input type="radio" name="q3_1" value="尝试过未稳定" data-show-example="true">是，尝试过但尚未稳定使用</label>
+                            <label><input type="radio" name="q3_1" value="计划尝试" data-show-example="true">计划尝试但尚未开始</label>
+                            <label><input type="radio" name="q3_1" value="尚未尝试" data-show-example="false">尚未尝试，觉得暂时用不上</label>
+                        </div>
+                        <div class="sub-q" id="sub_q3_1">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q3_1_example" placeholder="请描述具体方法或工具…"></textarea>
+                            <div class="required-hint" id="hint_q3_1">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">3.2</span> 返岗后，您是否基于培训内容向团队或上级提出了工作流程、沟通方式等方面的改进建议？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q3_2">
+                            <label><input type="radio" name="q3_2" value="已提出建议" data-show-example="true">是，已提出建议</label>
+                            <label><input type="radio" name="q3_2" value="已有想法" data-show-example="true">是，已有想法但尚未正式提出</label>
+                            <label><input type="radio" name="q3_2" value="尚未提出" data-show-example="true">尚未提出，暂时没有相关想法</label>
+                            <label><input type="radio" name="q3_2" value="不适用" data-show-example="false">不适用</label>
+                        </div>
+                        <div class="sub-q" id="sub_q3_2">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q3_2_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q3_2">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">3.3</span> 返岗后，您是否已在内部分享过培训收获？（例如：部门会分享、非正式交流、书面总结等）<span class="required-star">*</span></span>
+                        <div class="options" data-target="q3_3">
+                            <label><input type="radio" name="q3_3" value="正式分享" data-show-example="true">是，已进行正式分享（部门会/汇报等）</label>
+                            <label><input type="radio" name="q3_3" value="非正式分享" data-show-example="true">是，已在非正式场合分享过</label>
+                            <label><input type="radio" name="q3_3" value="计划分享" data-show-example="true">计划分享但尚未进行</label>
+                            <label><input type="radio" name="q3_3" value="尚未分享" data-show-example="false">尚未分享</label>
+                        </div>
+                        <div class="sub-q" id="sub_q3_3">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q3_3_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q3_3">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">3.4</span> 与培训前相比，您在工作中处理涉及跨文化沟通的任务时，效果或效率是否有变化？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q3_4">
+                            <label><input type="radio" name="q3_4" value="明显提升" data-show-example="true">有明显提升</label>
+                            <label><input type="radio" name="q3_4" value="有一定提升" data-show-example="true">有一定提升</label>
+                            <label><input type="radio" name="q3_4" value="变化不大" data-show-example="true">变化不大</label>
+                            <label><input type="radio" name="q3_4" value="反而更慢" data-show-example="false">反而更慢了（需要更多时间适应）</label>
+                        </div>
+                        <div class="sub-q" id="sub_q3_4">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q3_4_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q3_4">请填写具体案例</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 维度四 -->
+                <div class="section">
+                    <div class="section-title">维度四：人际网络变化</div>
+                    <div class="section-desc">以下题目想了解您在培训中建立的人际关系是否对工作产生了实际影响。</div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">4.1</span> 返岗后，您是否通过培训中建立的人脉获得了工作上的帮助或信息？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q4_1">
+                            <label><input type="radio" name="q4_1" value="多次获得" data-show-example="true">是，多次获得</label>
+                            <label><input type="radio" name="q4_1" value="有过1-2次" data-show-example="true">是，有过1-2次</label>
+                            <label><input type="radio" name="q4_1" value="以后可能" data-show-example="true">暂时还没有，但觉得以后可能用得上</label>
+                            <label><input type="radio" name="q4_1" value="没有" data-show-example="false">没有</label>
+                        </div>
+                        <div class="sub-q" id="sub_q4_1">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q4_1_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q4_1">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">4.2</span> 返岗后，您是否与培训中认识的同事有过工作上的合作？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q4_2">
+                            <label><input type="radio" name="q4_2" value="3次及以上" data-show-example="true">有3次及以上</label>
+                            <label><input type="radio" name="q4_2" value="1-2次" data-show-example="true">有1-2次</label>
+                            <label><input type="radio" name="q4_2" value="正在沟通" data-show-example="true">正在沟通中但尚未落地</label>
+                            <label><input type="radio" name="q4_2" value="暂时没有" data-show-example="false">暂时没有</label>
+                        </div>
+                        <div class="sub-q" id="sub_q4_2">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q4_2_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q4_2">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">4.3</span> 返岗后，您在培训中认识的同事是否曾在工作中给您提供过帮助或支持？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q4_3">
+                            <label><input type="radio" name="q4_3" value="多次提供" data-show-example="true">是，多次提供过</label>
+                            <label><input type="radio" name="q4_3" value="有过1-2次" data-show-example="true">是，有过1-2次</label>
+                            <label><input type="radio" name="q4_3" value="以后可能会有" data-show-example="true">暂时还没有，但以后可能会有</label>
+                            <label><input type="radio" name="q4_3" value="没有" data-show-example="false">没有</label>
+                        </div>
+                        <div class="sub-q" id="sub_q4_3">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q4_3_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q4_3">请填写具体案例</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 维度五 -->
+                <div class="section">
+                    <div class="section-title">维度五：语言与跨文化能力变化</div>
+                    <div class="section-desc">以下题目想了解您的语言使用意愿和跨文化适应能力是否有所提升。</div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">5.1</span> 返岗后，您是否仍在持续学习中文或法语？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q5_1">
+                            <label><input type="radio" name="q5_1" value="坚持定期学习" data-show-example="true">是，坚持定期学习</label>
+                            <label><input type="radio" name="q5_1" value="偶尔学习" data-show-example="true">偶尔学习，不太规律</label>
+                            <label><input type="radio" name="q5_1" value="计划学习" data-show-example="true">计划学习但尚未开始</label>
+                            <label><input type="radio" name="q5_1" value="已停止" data-show-example="false">已停止学习</label>
+                        </div>
+                        <div class="sub-q" id="sub_q5_1">
+                            <div class="hint">请谈谈您的学习计划：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q5_1_example" placeholder="请描述您的学习计划…"></textarea>
+                            <div class="required-hint" id="hint_q5_1">请填写学习计划</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">5.2</span> 返岗后，在跨文化工作场景中，您的表现是否有变化？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q5_2">
+                            <label><input type="radio" name="q5_2" value="明显更主动" data-show-example="true">明显更主动、更适应了</label>
+                            <label><input type="radio" name="q5_2" value="有一定改善" data-show-example="true">有一定改善，但偶尔仍会犹豫或不适应</label>
+                            <label><input type="radio" name="q5_2" value="变化不大" data-show-example="true">变化不大</label>
+                            <label><input type="radio" name="q5_2" value="更不自在" data-show-example="false">反而更不自在或更犹豫了</label>
+                        </div>
+                        <div class="sub-q" id="sub_q5_2">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q5_2_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q5_2">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">5.3</span> 与培训前相比，您的中文或法语水平是否有提升？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q5_3">
+                            <label><input type="radio" name="q5_3" value="明显提升" data-show-example="true">有明显提升（例如：能独立完成日常工作场景中的基本沟通）</label>
+                            <label><input type="radio" name="q5_3" value="有一点提升" data-show-example="true">有一点提升（例如：能听懂或说出更多关键词汇和短句）</label>
+                            <label><input type="radio" name="q5_3" value="变化不大" data-show-example="true">变化不大（例如：仍主要依赖翻译或第三方协助沟通）</label>
+                            <label><input type="radio" name="q5_3" value="没有提升" data-show-example="false">没有提升</label>
+                        </div>
+                        <div class="sub-q" id="sub_q5_3">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q5_3_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q5_3">请填写具体案例</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 维度六 -->
+                <div class="section">
+                    <div class="section-title">维度六：归属感与心态变化</div>
+                    <div class="section-desc">以下题目想了解您对公司的归属感和职业发展心态是否发生了变化。</div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">6.1</span> 与培训前相比，您对宝武资源公司的归属感是否有变化？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q6_1">
+                            <label><input type="radio" name="q6_1" value="明显增强" data-show-example="true">明显增强</label>
+                            <label><input type="radio" name="q6_1" value="有所增强" data-show-example="true">有所增强</label>
+                            <label><input type="radio" name="q6_1" value="变化不大" data-show-example="true">变化不大</label>
+                            <label><input type="radio" name="q6_1" value="减弱了" data-show-example="false">减弱了</label>
+                        </div>
+                        <div class="sub-q" id="sub_q6_1">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q6_1_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q6_1">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">6.2</span> 如果有进阶培训机会，您是否愿意继续参加？<span class="required-star">*</span></span>
+                        <div class="options">
+                            <label><input type="radio" name="q6_2" value="非常愿意">非常愿意</label>
+                            <label><input type="radio" name="q6_2" value="愿意">愿意</label>
+                            <label><input type="radio" name="q6_2" value="视情况而定">视情况而定</label>
+                            <label><input type="radio" name="q6_2" value="不愿意">不愿意</label>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">6.3</span> 与培训前相比，您参与国际化工作任务的意愿是否有变化？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q6_3">
+                            <label><input type="radio" name="q6_3" value="明显更愿意" data-show-example="true">明显更愿意参与</label>
+                            <label><input type="radio" name="q6_3" value="有所提升" data-show-example="true">有所提升</label>
+                            <label><input type="radio" name="q6_3" value="变化不大" data-show-example="true">变化不大</label>
+                            <label><input type="radio" name="q6_3" value="更不愿意" data-show-example="false">反而更不愿意了</label>
+                        </div>
+                        <div class="sub-q" id="sub_q6_3">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q6_3_example" placeholder="请描述具体案例…"></textarea>
+                            <div class="required-hint" id="hint_q6_3">请填写具体案例</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 综合 -->
+                <div class="section">
+                    <div class="section-title">综合自评</div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">7.1</span> 您认为截至目前，培训对您的实际工作产生了什么影响？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q7_1">
+                            <label><input type="radio" name="q7_1" value="积极显著" data-show-example="true">产生了积极且显著的影响</label>
+                            <label><input type="radio" name="q7_1" value="积极有限" data-show-example="true">产生了积极但有限的影响</label>
+                            <label><input type="radio" name="q7_1" value="影响很小" data-show-example="true">影响很小</label>
+                            <label><input type="radio" name="q7_1" value="没有影响" data-show-example="false">没有产生明显影响</label>
+                        </div>
+                        <div class="sub-q" id="sub_q7_1">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q7_1_example" placeholder="请描述具体案例…" style="min-height:50px;"></textarea>
+                            <div class="required-hint" id="hint_q7_1">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">7.2</span> 您认为培训所学内容的整体转化率（已实际应用的比例）大约是多少？<span class="required-star">*</span></span>
+                        <div class="options" data-target="q7_2">
+                            <label><input type="radio" name="q7_2" value="80以上" data-show-example="true">80%以上已转化应用</label>
+                            <label><input type="radio" name="q7_2" value="50-80" data-show-example="true">50%-80%已转化应用</label>
+                            <label><input type="radio" name="q7_2" value="20-50" data-show-example="true">20%-50%已转化应用</label>
+                            <label><input type="radio" name="q7_2" value="20以下" data-show-example="false">20%以下</label>
+                        </div>
+                        <div class="sub-q" id="sub_q7_2">
+                            <div class="hint">请举出具体案例：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q7_2_example" placeholder="请描述具体案例…" style="min-height:50px;"></textarea>
+                            <div class="required-hint" id="hint_q7_2">请填写具体案例</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">7.3</span> 您认为哪些因素促进了培训成果的转化？（可多选）<span class="required-star">*</span></span>
+                        <div class="options">
+                            <label><input type="checkbox" name="q7_3" value="上级支持">直属上级的支持和关注</label>
+                            <label><input type="checkbox" name="q7_3" value="应用场景">工作中存在实际应用场景和机会</label>
+                            <label><input type="checkbox" name="q7_3" value="学员联系">与其他学员的持续联系和相互鼓励</label>
+                            <label><input type="checkbox" name="q7_3" value="个人主动性">个人主动性和意愿</label>
+                            <label><input type="checkbox" name="q7_3" value="公司重视">公司对培训应用的重视和认可</label>
+                            <label><input type="checkbox" name="q7_3" value="其他促进" data-target="q7_3_other">其他（请填写具体内容）</label>
+                        </div>
+                        <div class="sub-q" id="sub_q7_3_other">
+                            <div class="hint">请填写具体内容：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q7_3_other" placeholder="如选择“其他”，请填写具体内容…" style="min-height:40px;"></textarea>
+                            <div class="required-hint" id="hint_q7_3_other">请填写具体内容</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">7.4</span> 您认为哪些因素阻碍了培训成果的转化？（可多选）<span class="required-star">*</span></span>
+                        <div class="options">
+                            <label><input type="checkbox" name="q7_4" value="工作繁忙">日常工作繁忙，没有时间和精力应用</label>
+                            <label><input type="checkbox" name="q7_4" value="场景不匹配">工作场景与培训内容匹配度不高</label>
+                            <label><input type="checkbox" name="q7_4" value="缺乏上级支持">缺乏上级的关注和支持</label>
+                            <label><input type="checkbox" name="q7_4" value="缺乏巩固机会">缺乏继续学习和巩固的机会</label>
+                            <label><input type="checkbox" name="q7_4" value="语言文化困难">语言或文化方面的困难仍然存在</label>
+                            <label><input type="checkbox" name="q7_4" value="其他阻碍" data-target="q7_4_other">其他（请填写具体内容）</label>
+                        </div>
+                        <div class="sub-q" id="sub_q7_4_other">
+                            <div class="hint">请填写具体内容：<span style="color:#c62828;">*</span></div>
+                            <textarea name="q7_4_other" placeholder="如选择“其他”，请填写具体内容…" style="min-height:40px;"></textarea>
+                            <div class="required-hint" id="hint_q7_4_other">请填写具体内容</div>
+                        </div>
+                    </div>
+                    <div class="q-item">
+                        <span class="q-label"><span class="q-num">7.5</span> 您对后续培训有哪些建议？<span class="required-star">*</span></span>
+                        <div class="sub-q" style="display:block;"><textarea name="q7_5" placeholder="请提出您的宝贵建议…" style="min-height:60px;"></textarea></div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" onclick="submitSurvey()">提交问卷</button>
+                    <button type="reset" class="btn btn-outline">重置</button>
+                </div>
+            </form>
+            <div class="footnote">本问卷所有数据仅用于培训效果评估，不涉及对您个人的任何评价。</div>
+        </div>
+
+        <!-- 提交成功页 -->
+        <div id="pageSuccess" class="hidden">
+            <div class="success-box"><div class="icon">✅</div><h2>提交成功！</h2><p>感谢您的认真填写，您的反馈对我们持续改进培训项目至关重要。</p><p style="margin-top:8px;font-size:14px;color:#999;">如需重新提交，请刷新页面后再次填写。</p></div>
+        </div>
+
+        <!-- 报告页 -->
+        <div id="pageReport" class="hidden">
+            <div class="report-header">
+                <h2>📊 “山海计划”培训效果评估报告</h2>
+                <div class="report-actions">
+                    <button class="btn btn-success" onclick="downloadExcel()">📥 下载Excel报告</button>
+                    <button class="btn btn-success" onclick="generatePrintableReport()">📄 生成打印报告</button>
+                    <button class="btn btn-outline" onclick="clearAllData()">🗑 清空数据</button>
+                    <button class="btn btn-outline" onclick="backToSurvey()">← 返回问卷</button>
+                </div>
+            </div>
+            <div id="reportContent"></div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #e9edf4;">
+            <button class="btn btn-outline" onclick="showReportPassword()" style="font-size:13px;color:#999;">🔒 查看评估报告</button>
+        </div>
+    </div>
+
+    <!-- 密码弹窗 -->
+    <div id="passwordModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>🔒 请输入查看密码</h3>
+            <p>本报告包含学员评估结果，仅限培训组织方查看。</p>
+            <input type="password" id="reportPassword" placeholder="请输入密码…" />
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="closePasswordModal()">取消</button>
+                <button class="btn btn-primary" onclick="verifyPassword()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================================
+        // 指标定义（四档）
+        // =============================================================
+        const INDICATORS = {
+            U01: { id: 'U01', dim: '理解变化', name: '概念应用', q: 'q1_1', levels: { '优秀': ['多次运用'], '良好': ['有过1-2次'],
+                    '达标': ['有过想法但未运用'], '待提升': ['否'] } },
+            U02: { id: 'U02', dim: '理解变化', name: '战略理解提升', q: 'q1_2', levels: { '优秀': ['显著变化'], '良好': ['有一定变化'],
+                    '达标': ['变化不大'], '待提升': ['没有变化'] } },
+            U03: { id: 'U03', dim: '理解变化', name: '跨文化心态转变', q: 'q1_3', levels: { '优秀': ['明显变化'], '良好': ['有一定变化'],
+                    '达标': ['变化不大'], '待提升': ['没有变化'] } },
+            B01: { id: 'B01', dim: '行为变化', name: '沟通行为调整', q: 'q2_1', levels: { '优秀': ['经常调整'], '良好': ['偶尔调整'],
+                    '达标': ['想过但未做'], '待提升': ['没有调整过'] } },
+            B02: { id: 'B02', dim: '行为变化', name: '跨地区联系建立', q: 'q2_2', levels: { '优秀': ['实质工作联系'], '良好': ['友好联系'],
+                    '达标': ['计划联系'], '待提升': ['尚未建立联系'] } },
+            B03: { id: 'B03', dim: '行为变化', name: '跨文化协调承担', q: 'q2_3', levels: { '优秀': ['多次主动承担'], '良好': ['有过1-2次'],
+                    '达标': ['有过机会未承担'], '待提升': ['没有遇到过机会'] } },
+            W01: { id: 'W01', dim: '工作产出', name: '新方法应用', q: 'q3_1', levels: { '优秀': ['已尝试并持续使用'], '良好': ['尝试过未稳定'],
+                    '达标': ['计划尝试'], '待提升': ['尚未尝试'] } },
+            W02: { id: 'W02', dim: '工作产出', name: '改进建议提出', q: 'q3_2', levels: { '优秀': ['已提出建议'], '良好': ['已有想法'],
+                    '达标': ['尚未提出'], '待提升': ['不适用'] } },
+            W03: { id: 'W03', dim: '工作产出', name: '内部分享', q: 'q3_3', levels: { '优秀': ['正式分享'], '良好': ['非正式分享'],
+                    '达标': ['计划分享'], '待提升': ['尚未分享'] } },
+            W04: { id: 'W04', dim: '工作产出', name: '跨文化任务效率', q: 'q3_4', levels: { '优秀': ['明显提升'], '良好': ['有一定提升'],
+                    '达标': ['变化不大'], '待提升': ['反而更慢'] } },
+            N01: { id: 'N01', dim: '人际网络', name: '人脉帮助获取', q: 'q4_1', levels: { '优秀': ['多次获得'], '良好': ['有过1-2次'],
+                    '达标': ['以后可能'], '待提升': ['没有'] } },
+            N02: { id: 'N02', dim: '人际网络', name: '工作协同', q: 'q4_2', levels: { '优秀': ['3次及以上'], '良好': ['1-2次'],
+                    '达标': ['正在沟通'], '待提升': ['暂时没有'] } },
+            L01: { id: 'L01', dim: '语言能力', name: '语言学习持续', q: 'q5_1', levels: { '优秀': ['坚持定期学习'], '良好': ['偶尔学习'],
+                    '达标': ['计划学习'], '待提升': ['已停止'] } },
+            L02: { id: 'L02', dim: '语言能力', name: '跨文化表现改善', q: 'q5_2', levels: { '优秀': ['明显更主动'], '良好': ['有一定改善'],
+                    '达标': ['变化不大'], '待提升': ['更不自在'] } },
+            L03: { id: 'L03', dim: '语言能力', name: '语言水平提升', q: 'q5_3', levels: { '优秀': ['明显提升'], '良好': ['有一点提升'],
+                    '达标': ['变化不大'], '待提升': ['没有提升'] } },
+            E01: { id: 'E01', dim: '归属感', name: '归属感增强', q: 'q6_1', levels: { '优秀': ['明显增强'], '良好': ['有所增强'],
+                    '达标': ['变化不大'], '待提升': ['减弱了'] } },
+            E02: { id: 'E02', dim: '归属感', name: '进阶培训意愿', q: 'q6_2', levels: { '优秀': ['非常愿意'], '良好': ['愿意'],
+                    '达标': ['视情况而定'], '待提升': ['不愿意'] } },
+            E03: { id: 'E03', dim: '归属感', name: '国际化意愿', q: 'q6_3', levels: { '优秀': ['明显更愿意'], '良好': ['有所提升'],
+                    '达标': ['变化不大'], '待提升': ['更不愿意'] } }
+        };
+        const INDICATOR_IDS = Object.keys(INDICATORS);
+        const DIM_ORDER = ['理解变化', '行为变化', '工作产出', '人际网络', '语言能力', '归属感'];
+        const LEVEL_ORDER = ['优秀', '良好', '达标', '待提升'];
+
+        // =============================================================
+        // 数据存储
+        // =============================================================
+        function getResponses() { return JSON.parse(localStorage.getItem('shanhai_responses') || '[]'); }
+
+        function saveResponse(resp) { const d = getResponses();
+            d.push(resp);
+            localStorage.setItem('shanhai_responses', JSON.stringify(d)); }
+
+        function getRadioValue(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value :
+                null; }
+
+        function getCheckboxValues(name) { return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el =>
+                el.value); }
+
+        function getTextValue(name) { const el = document.querySelector(`[name="${name}"]`); return el ? el.value.trim() : ''; }
+
+        // =============================================================
+        // 条件显示 + 提交验证
+        // =============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // 处理 radio 选项（显示/隐藏案例框）
+            document.querySelectorAll('.options input[type="radio"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    const optionsDiv = this.closest('.options');
+                    if (!optionsDiv) return;
+                    const targetId = optionsDiv.dataset.target;
+                    if (!targetId) return;
+                    const subQ = document.getElementById('sub_' + targetId);
+                    if (!subQ) return;
+                    const show = this.dataset.showExample === 'true';
+                    if (show) { subQ.classList.add('show'); } else { subQ.classList.remove('show');
+                        subQ.querySelector('textarea').value = ''; }
+                });
+            });
+
+            // 处理 7.3 和 7.4 的 checkbox 联动
+            document.querySelectorAll('.options input[type="checkbox"][data-target]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const targetId = this.dataset.target;
+                    const subQ = document.getElementById('sub_' + targetId);
+                    if (!subQ) return;
+                    if (this.checked) {
+                        subQ.classList.add('show');
+                    } else {
+                        subQ.classList.remove('show');
+                        subQ.querySelector('textarea').value = '';
+                    }
+                });
+            });
+        });
+
+        function submitSurvey() {
+            const radioNames = ['region', 'q1_1', 'q1_2', 'q1_3', 'q2_1', 'q2_2', 'q2_3', 'q3_1', 'q3_2', 'q3_3', 'q3_4',
+                'q4_1', 'q4_2', 'q4_3', 'q5_1', 'q5_2', 'q5_3', 'q6_1', 'q6_2', 'q6_3', 'q7_1', 'q7_2'
+            ];
+            for (let n of radioNames) { if (!document.querySelector(`input[name="${n}"]:checked`)) { alert(
+                        '请完成所有选择题后再提交。'); return; } }
+
+            // 可见案例（radio触发的）
+            document.querySelectorAll('.sub-q.show').forEach(function(subQ) {
+                const ta = subQ.querySelector('textarea');
+                if (ta && ta.value.trim() === '') { subQ.querySelector('.required-hint').classList.add('show'); } else { subQ
+                        .querySelector('.required-hint').classList.remove('show'); }
+            });
+
+            // 固定开放题
+            const fixed = ['q1_4', 'q2_4', 'q7_5'];
+            for (let f of fixed) { if (document.querySelector(`[name="${f}"]`).value.trim() === '') { alert(
+                        '请完成所有必填的案例说明后再提交。'); return; } }
+
+            // 检查 7.3 其他框
+            const q7_3_other = document.querySelector('input[name="q7_3"][value="其他促进"]');
+            if (q7_3_other && q7_3_other.checked) {
+                const val = document.querySelector('[name="q7_3_other"]').value.trim();
+                if (val === '') { alert('请填写“其他”促进因素的具体内容。'); return; }
+            }
+
+            // 检查 7.4 其他框
+            const q7_4_other = document.querySelector('input[name="q7_4"][value="其他阻碍"]');
+            if (q7_4_other && q7_4_other.checked) {
+                const val = document.querySelector('[name="q7_4_other"]').value.trim();
+                if (val === '') { alert('请填写“其他”阻碍因素的具体内容。'); return; }
+            }
+
+            if (document.querySelectorAll('.required-hint.show').length > 0) { alert('请完成所有必填的案例说明后再提交。'); return; }
+
+            const resp = {
+                timestamp: new Date().toISOString(),
+                region: getRadioValue('region'),
+                q1_1: getRadioValue('q1_1'),
+                q1_2: getRadioValue('q1_2'),
+                q1_3: getRadioValue('q1_3'),
+                q2_1: getRadioValue('q2_1'),
+                q2_2: getRadioValue('q2_2'),
+                q2_3: getRadioValue('q2_3'),
+                q3_1: getRadioValue('q3_1'),
+                q3_2: getRadioValue('q3_2'),
+                q3_3: getRadioValue('q3_3'),
+                q3_4: getRadioValue('q3_4'),
+                q4_1: getRadioValue('q4_1'),
+                q4_2: getRadioValue('q4_2'),
+                q4_3: getRadioValue('q4_3'),
+                q5_1: getRadioValue('q5_1'),
+                q5_2: getRadioValue('q5_2'),
+                q5_3: getRadioValue('q5_3'),
+                q6_1: getRadioValue('q6_1'),
+                q6_2: getRadioValue('q6_2'),
+                q6_3: getRadioValue('q6_3'),
+                q7_1: getRadioValue('q7_1'),
+                q7_2: getRadioValue('q7_2'),
+                q7_3: getCheckboxValues('q7_3'),
+                q7_4: getCheckboxValues('q7_4'),
+                q1_1_example: getTextValue('q1_1_example'),
+                q1_2_example: getTextValue('q1_2_example'),
+                q1_3_example: getTextValue('q1_3_example'),
+                q1_4: getTextValue('q1_4'),
+                q2_1_example: getTextValue('q2_1_example'),
+                q2_2_example: getTextValue('q2_2_example'),
+                q2_3_example: getTextValue('q2_3_example'),
+                q2_4: getTextValue('q2_4'),
+                q3_1_example: getTextValue('q3_1_example'),
+                q3_2_example: getTextValue('q3_2_example'),
+                q3_3_example: getTextValue('q3_3_example'),
+                q3_4_example: getTextValue('q3_4_example'),
+                q4_1_example: getTextValue('q4_1_example'),
+                q4_2_example: getTextValue('q4_2_example'),
+                q4_3_example: getTextValue('q4_3_example'),
+                q5_1_example: getTextValue('q5_1_example'),
+                q5_2_example: getTextValue('q5_2_example'),
+                q5_3_example: getTextValue('q5_3_example'),
+                q6_1_example: getTextValue('q6_1_example'),
+                q6_3_example: getTextValue('q6_3_example'),
+                q7_1_example: getTextValue('q7_1_example'),
+                q7_2_example: getTextValue('q7_2_example'),
+                q7_3_other: getTextValue('q7_3_other'),
+                q7_4_other: getTextValue('q7_4_other'),
+                q7_5: getTextValue('q7_5'),
+            };
+            saveResponse(resp);
+
+            document.getElementById('pageSurvey').classList.add('hidden');
+            document.getElementById('pageSuccess').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // =============================================================
+        // 评估逻辑（已修复：增加 passed 和 total 字段）
+        // =============================================================
+        function evaluateResponse(resp) {
+            const results = {};
+            const levelCount = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0 };
+            let total = 0;
+            for (let id of INDICATOR_IDS) {
+                const ind = INDICATORS[id];
+                const val = resp[ind.q] || '';
+                let level = '待提升';
+                for (let lv of LEVEL_ORDER) {
+                    if (ind.levels[lv] && ind.levels[lv].includes(val)) { level = lv; break; }
+                }
+                results[id] = level;
+                levelCount[level]++;
+                total++;
+            }
+            const passed = levelCount['优秀'] + levelCount['良好'];
+            let overall = '待提升';
+            if (levelCount['优秀'] >= 12) overall = '优秀';
+            else if (levelCount['优秀'] + levelCount['良好'] >= 8) overall = '良好';
+            else if (levelCount['优秀'] + levelCount['良好'] + levelCount['达标'] >= 5) overall = '达标';
+            return { results, levelCount, overall, passed, total };
+        }
+
+        // =============================================================
+        // 报告渲染
+        // =============================================================
+        function renderReport() {
+            const data = getResponses();
+            if (data.length === 0) {
+                document.getElementById('reportContent').innerHTML =
+                    '<div style="text-align:center;padding:40px 20px;color:#6b7a8f;"><p style="font-size:18px;">📭 暂无学员提交数据</p><p style="font-size:14px;">请等待学员填写问卷后再查看评估报告。</p></div>';
+                return;
+            }
+            const stats = {};
+            for (let id of INDICATOR_IDS) stats[id] = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0, total: 0 };
+            const allLevelCount = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0 };
+            const allRatings = [];
+            for (let resp of data) {
+                const ev = evaluateResponse(resp);
+                for (let id of INDICATOR_IDS) {
+                    stats[id][ev.results[id]] = (stats[id][ev.results[id]] || 0) + 1;
+                    stats[id].total++;
+                }
+                for (let lv of LEVEL_ORDER) allLevelCount[lv] += ev.levelCount[lv] || 0;
+                const rating = getRating(ev.levelCount);
+                allRatings.push(rating);
+            }
+            const totalSubmissions = data.length;
+            const totalIndicators = Object.keys(INDICATORS).length;
+            const totalEvaluations = totalSubmissions * totalIndicators;
+            const avgPassed = ((allLevelCount['优秀'] + allLevelCount['良好']) / totalEvaluations * 100).toFixed(1);
+
+            const dimStats = {};
+            for (let d of DIM_ORDER) dimStats[d] = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0, total: 0 };
+            for (let id of INDICATOR_IDS) {
+                const ind = INDICATORS[id];
+                const s = stats[id];
+                for (let lv of LEVEL_ORDER) dimStats[ind.dim][lv] += s[lv] || 0;
+                dimStats[ind.dim].total += s.total;
+            }
+
+            const ratingCount = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0 };
+            for (let r of allRatings) ratingCount[r.label]++;
+
+            let html = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;">
+                    <div class="report-stat-card"><div class="num">${totalSubmissions}</div><div class="label">提交学员数</div></div>
+                    <div class="report-stat-card green"><div class="num">${avgPassed}%</div><div class="label">优良达成率</div></div>
+                    <div class="report-stat-card"><div class="num">${totalIndicators}</div><div class="label">评估指标总数</div></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:24px;">
+                    ${Object.entries(ratingCount).map(([label,count])=>`<div class="report-stat-card ${label==='优秀'?'green':label==='良好'?'':label==='达标'?'orange':'red'}"><div class="num">${count}</div><div class="label">${label}</div></div>`).join('')}
+                </div>
+            `;
+
+            html += `<div style="font-size:16px;font-weight:600;margin:16px 0 8px 0;">各维度评估分布</div><div class="dim-summary">`;
+            for (let d of DIM_ORDER) {
+                const s = dimStats[d];
+                const goodRate = s.total > 0 ? ((s['优秀'] + s['良好']) / s.total * 100).toFixed(1) : 0;
+                html +=
+                    `<div class="dim-card"><div class="dim-name">${d}</div><div class="dim-rate">${goodRate}%</div><div style="font-size:11px;color:#6b7a8f;">🌟${s['优秀']} 👍${s['良好']} ⚪${s['达标']} ⚠️${s['待提升']}</div></div>`;
+            }
+            html += `</div>`;
+
+            html += `<div style="font-size:16px;font-weight:600;margin:20px 0 8px 0;">各指标评估详情</div><div class="report-table-wrap"><table class="report-table"><thead><tr><th>维度</th><th>指标</th><th>🌟优秀</th><th>👍良好</th><th>⚪达标</th><th>⚠️待提升</th><th>优良率</th></tr></thead><tbody>`;
+            for (let d of DIM_ORDER) {
+                let first = true;
+                for (let id of INDICATOR_IDS) {
+                    const ind = INDICATORS[id];
+                    if (ind.dim !== d) continue;
+                    const s = stats[id];
+                    const goodRate = s.total > 0 ? ((s['优秀'] + s['良好']) / s.total * 100).toFixed(1) : 0;
+                    html += `<tr>${first?`<td class="dim-label" rowspan="${Object.keys(INDICATORS).filter(k=>INDICATORS[k].dim===d).length}">${d}</td>`:''}
+                        <td class="ind-label">${ind.name}</td>
+                        <td>${s['优秀']||0}</td><td>${s['良好']||0}</td><td>${s['达标']||0}</td><td>${s['待提升']||0}</td>
+                        <td><span class="${goodRate>=70?'badge-done':goodRate>=40?'badge-rate':'badge-fail'}">${goodRate}%</span></td>
+                    </tr>`;
+                    first = false;
+                }
+            }
+            html += `</tbody></table></div>`;
+
+            html += `<div style="font-size:16px;font-weight:600;margin:20px 0 8px 0;">学员明细</div><div class="report-table-wrap"><table class="report-table"><thead><tr><th>#</th><th>地区</th><th>提交时间</th>`;
+            for (let id of INDICATOR_IDS) html += `<th style="font-size:10px;">${id}</th>`;
+            html += `<th>达成数</th><th>综合评级</th></tr></thead><tbody>`;
+            data.forEach((resp, idx) => {
+                const ev = evaluateResponse(resp);
+                const rating = getRating(ev.levelCount);
+                const time = new Date(resp.timestamp).toLocaleString('zh-CN');
+                html += `<tr><td>${idx+1}</td><td>${resp.region||'未选择'}</td><td style="font-size:12px;">${time}</td>`;
+                for (let id of INDICATOR_IDS) {
+                    const level = ev.results[id] || '待提升';
+                    const emoji = level === '优秀' ? '🌟' : level === '良好' ? '👍' : level === '达标' ? '⚪' : '⚠️';
+                    html += `<td style="font-size:11px;">${emoji}${level}</td>`;
+                }
+                html += `<td><strong>${ev.passed}/${ev.total}</strong></td>`;
+                html += `<td><span class="rating-badge ${rating.cls}">${rating.label}</span></td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+
+            document.getElementById('reportContent').innerHTML = html;
+        }
+
+        function getRating(levelCount) {
+            if (levelCount['优秀'] >= 12) return { label: '优秀', cls: 'excellent' };
+            if (levelCount['优秀'] + levelCount['良好'] >= 8) return { label: '良好', cls: 'good' };
+            if (levelCount['优秀'] + levelCount['良好'] + levelCount['达标'] >= 5) return { label: '达标', cls: 'pass' };
+            return { label: '待提升', cls: 'fail' };
+        }
+
+        // =============================================================
+        // 下载 Excel（导出每个学员的详细评估状况）
+        // =============================================================
+        function downloadExcel() {
+            const data = getResponses();
+            if (data.length === 0) { alert('暂无数据，无法生成Excel报告。'); return; }
+
+            const dimQuestions = {
+                '理解变化': [
+                    { label: '1.1 主动运用战略概念', key: 'q1_1', example: 'q1_1_example' },
+                    { label: '1.2 战略理解变化', key: 'q1_2', example: 'q1_2_example' },
+                    { label: '1.3 跨文化心态变化', key: 'q1_3', example: 'q1_3_example' },
+                    { label: '1.4 理解变化案例', key: 'q1_4', example: null }
+                ],
+                '行为变化': [
+                    { label: '2.1 沟通方式调整', key: 'q2_1', example: 'q2_1_example' },
+                    { label: '2.2 跨地区联系建立', key: 'q2_2', example: 'q2_2_example' },
+                    { label: '2.3 跨文化协调承担', key: 'q2_3', example: 'q2_3_example' },
+                    { label: '2.4 行为变化案例', key: 'q2_4', example: null }
+                ],
+                '工作产出': [
+                    { label: '3.1 新方法应用', key: 'q3_1', example: 'q3_1_example' },
+                    { label: '3.2 改进建议提出', key: 'q3_2', example: 'q3_2_example' },
+                    { label: '3.3 内部分享', key: 'q3_3', example: 'q3_3_example' },
+                    { label: '3.4 跨文化任务效率', key: 'q3_4', example: 'q3_4_example' }
+                ],
+                '人际网络': [
+                    { label: '4.1 人脉帮助获取', key: 'q4_1', example: 'q4_1_example' },
+                    { label: '4.2 工作协同', key: 'q4_2', example: 'q4_2_example' },
+                    { label: '4.3 同事帮助支持', key: 'q4_3', example: 'q4_3_example' }
+                ],
+                '语言能力': [
+                    { label: '5.1 语言学习持续', key: 'q5_1', example: 'q5_1_example' },
+                    { label: '5.2 跨文化表现变化', key: 'q5_2', example: 'q5_2_example' },
+                    { label: '5.3 语言水平提升', key: 'q5_3', example: 'q5_3_example' }
+                ],
+                '归属感': [
+                    { label: '6.1 归属感变化', key: 'q6_1', example: 'q6_1_example' },
+                    { label: '6.2 进阶培训意愿', key: 'q6_2', example: null },
+                    { label: '6.3 国际化意愿', key: 'q6_3', example: 'q6_3_example' }
+                ]
+            };
+
+            // 构建表头
+            const header1 = ['序号', '地区', '提交时间'];
+            const colSpan = {};
+            for (let dim of DIM_ORDER) {
+                const qs = dimQuestions[dim];
+                let count = 0;
+                for (let q of qs) {
+                    count += 2; // 答案 + 等级
+                    if (q.example) count += 1; // 案例
+                }
+                colSpan[dim] = count;
+                for (let i = 0; i < count; i++) {
+                    header1.push(i === 0 ? dim : '');
+                }
+            }
+
+            const header2 = ['', '', ''];
+            for (let dim of DIM_ORDER) {
+                const qs = dimQuestions[dim];
+                for (let q of qs) {
+                    header2.push(q.label);
+                    if (q.example) header2.push('案例');
+                    header2.push('等级');
+                }
+            }
+
+            const rows = [header1, header2];
+            data.forEach((resp, idx) => {
+                const ev = evaluateResponse(resp);
+                const row = [idx + 1, resp.region || '未选择', new Date(resp.timestamp).toLocaleString('zh-CN')];
+                for (let dim of DIM_ORDER) {
+                    const qs = dimQuestions[dim];
+                    for (let q of qs) {
+                        const ans = resp[q.key] || '';
+                        row.push(ans);
+                        if (q.example) {
+                            row.push(resp[q.example] || '');
+                        }
+                        const level = evaluateResponse(resp).results[Object.keys(INDICATORS).find(id => INDICATORS[
+                            id].q === q.key)] || '待提升';
+                        row.push(level);
+                    }
+                }
+                rows.push(row);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            ws['!cols'] = [{ wch: 8 }, { wch: 12 }, { wch: 20 }];
+            for (let i = 3; i < header1.length; i++) ws['!cols'].push({ wch: 14 });
+
+            const merges = [];
+            let startCol = 3;
+            for (let dim of DIM_ORDER) {
+                const count = colSpan[dim];
+                if (count > 0) {
+                    merges.push({ s: { r: 0, c: startCol }, e: { r: 0, c: startCol + count - 1 } });
+                    const cell = XLSX.utils.encode_cell({ r: 0, c: startCol });
+                    ws[cell] = { v: dim, t: 's' };
+                    startCol += count;
+                }
+            }
+            ws['!merges'] = merges;
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '评估明细');
+            const wbname = `山海计划评估报告_${new Date().toISOString().slice(0,10)}.xlsx`;
+            XLSX.writeFile(wb, wbname);
+        }
+
+        // =============================================================
+        // 生成打印报告
+        // =============================================================
+        function generatePrintableReport() {
+            const data = getResponses();
+            if (data.length === 0) { alert('暂无数据可生成打印报告。'); return; }
+            const stats = {};
+            for (let id of INDICATOR_IDS) stats[id] = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0, total: 0 };
+            const allLevelCount = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0 };
+            const allRatings = [];
+            for (let resp of data) {
+                const ev = evaluateResponse(resp);
+                for (let id of INDICATOR_IDS) {
+                    stats[id][ev.results[id]] = (stats[id][ev.results[id]] || 0) + 1;
+                    stats[id].total++;
+                }
+                for (let lv of LEVEL_ORDER) allLevelCount[lv] += ev.levelCount[lv] || 0;
+                allRatings.push(getRating(ev.levelCount));
+            }
+            const totalSubmissions = data.length;
+            const totalIndicators = Object.keys(INDICATORS).length;
+            const totalEvaluations = totalSubmissions * totalIndicators;
+            const avgPassed = ((allLevelCount['优秀'] + allLevelCount['良好']) / totalEvaluations * 100).toFixed(1);
+            const ratingCount = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0 };
+            for (let r of allRatings) ratingCount[r.label]++;
+
+            const dimStats = {};
+            for (let d of DIM_ORDER) dimStats[d] = { '优秀': 0, '良好': 0, '达标': 0, '待提升': 0, total: 0 };
+            for (let id of INDICATOR_IDS) {
+                const ind = INDICATORS[id];
+                const s = stats[id];
+                for (let lv of LEVEL_ORDER) dimStats[ind.dim][lv] += s[lv] || 0;
+                dimStats[ind.dim].total += s.total;
+            }
+
+            let html = `
+            <html><head><meta charset="UTF-8"><title>山海计划评估报告</title>
+            <style>body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding:30px;max-width:1100px;margin:auto;}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:16px 0;}.stat-card{background:#f5f8fe;border-radius:10px;padding:14px;text-align:center;}.stat-card .num{font-size:28px;font-weight:700;color:#1a73e8;}.stat-card .label{font-size:13px;color:#6b7a8f;}.stat-card.green .num{color:#2a7d4f;}.stat-card.orange .num{color:#e67e22;}.stat-card.red .num{color:#c62828;}h2{font-size:20px;margin:30px 0 14px;border-left:4px solid #1a73e8;padding-left:12px;}.dim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:12px 0;}.dim-card{background:#f8faff;border-radius:10px;padding:12px;text-align:center;border:1px solid #eef2f7;}.dim-card .dim-name{font-size:13px;color:#6b7a8f;}.dim-card .dim-rate{font-size:24px;font-weight:700;color:#0a2540;}table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}th{background:#1a2b3c;color:#fff;padding:8px 10px;text-align:center;}td{padding:6px 10px;border-bottom:1px solid #eaeef5;text-align:center;}.dim-label{text-align:left;font-weight:500;}.ind-label{text-align:left;padding-left:20px;}.badge{display:inline-block;padding:2px 14px;border-radius:12px;font-size:12px;font-weight:600;}.badge.done{background:#e6f7e6;color:#2a7d4f;}.badge.partial{background:#e8f0fe;color:#1a5a9c;}.badge.fail{background:#fee9e7;color:#c62828;}.rating{display:inline-block;padding:3px 16px;border-radius:20px;font-weight:700;font-size:13px;}.rating.excellent{background:#e6f7e6;color:#2a7d4f;}.rating.good{background:#e8f0fe;color:#1a5a9c;}.rating.pass{background:#fff3e0;color:#b76e1e;}.rating.fail{background:#fee9e7;color:#c62828;}.footer{margin-top:30px;text-align:center;font-size:13px;color:#6b7a8f;border-top:1px solid #e9edf4;padding-top:16px;}
+            .no-print{display:none;}
+            @media print{body{padding:20px;}.no-print{display:none;}}
+            </style>
+            </head><body>
+            <h1 style="text-align:center;border-bottom:4px solid #1a73e8;padding-bottom:16px;">📊 “山海计划”培训效果评估报告</h1>
+            <div style="text-align:center;font-size:14px;color:#6b7a8f;margin-bottom:20px;">报告生成时间：${new Date().toLocaleString('zh-CN')}</div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="num">${totalSubmissions}</div><div class="label">提交学员数</div></div>
+                <div class="stat-card green"><div class="num">${avgPassed}%</div><div class="label">优良达成率</div></div>
+                <div class="stat-card"><div class="num">${totalIndicators}</div><div class="label">评估指标总数</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:20px;">
+                ${Object.entries(ratingCount).map(([label,count])=>`<div class="stat-card ${label==='优秀'?'green':label==='良好'?'':label==='达标'?'orange':'red'}"><div class="num">${count}</div><div class="label">${label}</div></div>`).join('')}
+            </div>
+            <h2>各维度评估分布</h2>
+            <div class="dim-grid">
+                ${DIM_ORDER.map(d=>{const s=dimStats[d];const goodRate=s.total?((s['优秀']+s['良好'])/s.total*100).toFixed(1):0;return `<div class="dim-card"><div class="dim-name">${d}</div><div class="dim-rate">${goodRate}%</div><div style="font-size:11px;color:#6b7a8f;">🌟${s['优秀']} 👍${s['良好']} ⚪${s['达标']} ⚠️${s['待提升']}</div></div>`;}).join('')}
+            </div>
+            <h2>各指标评估详情</h2>
+            <table><thead><tr><th>维度</th><th>指标</th><th>🌟优秀</th><th>👍良好</th><th>⚪达标</th><th>⚠️待提升</th><th>优良率</th></tr></thead><tbody>
+            ${DIM_ORDER.map(d=>{let first=true;return INDICATOR_IDS.filter(id=>INDICATORS[id].dim===d).map(id=>{const ind=INDICATORS[id];const s=stats[id];const goodRate=s.total?((s['优秀']+s['良好'])/s.total*100).toFixed(1):0;return `<tr>${first?`<td class="dim-label" rowspan="${INDICATOR_IDS.filter(k=>INDICATORS[k].dim===d).length}">${d}</td>`:''}<td class="ind-label">${ind.name}</td><td>${s['优秀']||0}</td><td>${s['良好']||0}</td><td>${s['达标']||0}</td><td>${s['待提升']||0}</td><td><span class="badge ${goodRate>=70?'done':goodRate>=40?'partial':'fail'}">${goodRate}%</span></td></tr>`;first=false;}).join('');}).join('')}
+            </tbody></table>
+            <h2>学员明细</h2>
+            <table><thead><tr><th>#</th><th>地区</th><th>提交时间</th>${INDICATOR_IDS.map(id=>`<th style="font-size:10px;">${id}</th>`).join('')}<th>达成数</th><th>综合评级</th></tr></thead><tbody>
+            ${data.map((resp,idx)=>{const ev=evaluateResponse(resp);const rating=getRating(ev.levelCount);const time=new Date(resp.timestamp).toLocaleString('zh-CN');return `<tr><td>${idx+1}</td><td>${resp.region||'未选择'}</td><td style="font-size:12px;">${time}</td>${INDICATOR_IDS.map(id=>{const l=ev.results[id]||'待提升';const emoji=l==='优秀'?'🌟':l==='良好'?'👍':l==='达标'?'⚪':'⚠️';return `<td style="font-size:11px;">${emoji}${l}</td>`;}).join('')}<td><strong>${ev.passed}/${ev.total}</strong></td><td><span class="rating ${rating.cls}">${rating.label}</span></td></tr>`;}).join('')}
+            </tbody></table>
+            <div class="footer">报告来源：“山海计划”培训效果跟踪系统 · ${new Date().toLocaleDateString('zh-CN')}</div>
+            </body></html>
+            `;
+            const win = window.open('', '_blank', 'width=1100,height=800');
+            if (!win) { alert('请允许弹出窗口，以便生成打印报告。'); return; }
+            win.document.write(html);
+            win.document.close();
+        }
+
+        // =============================================================
+        // 密码验证
+        // =============================================================
+        const PASSWORD = 'admin123';
+
+        function showReportPassword() {
+            document.getElementById('passwordModal').classList.remove('hidden');
+            document.getElementById('reportPassword').value = '';
+            document.getElementById('reportPassword').focus();
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        function verifyPassword() {
+            if (document.getElementById('reportPassword').value === PASSWORD) {
+                closePasswordModal();
+                document.getElementById('pageSurvey').classList.add('hidden');
+                document.getElementById('pageSuccess').classList.add('hidden');
+                document.getElementById('pageReport').classList.remove('hidden');
+                renderReport();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                alert('密码错误，请重新输入。');
+                document.getElementById('reportPassword').value = '';
+                document.getElementById('reportPassword').focus();
+            }
+        }
+
+        function backToSurvey() {
+            document.getElementById('pageReport').classList.add('hidden');
+            document.getElementById('pageSurvey').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearAllData() {
+            if (confirm('确定要清空所有已提交的数据吗？此操作不可恢复。')) {
+                localStorage.removeItem('shanhai_responses');
+                alert('数据已清空。');
+                renderReport();
+            }
+        }
+
+        document.getElementById('reportPassword').addEventListener('keydown', function(e) { if (e.key === 'Enter') verifyPassword
+                (); });
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'R' || e.key === 'r')) { e.preventDefault();
+                showReportPassword(); }
+        });
+        console.log('🔐 快捷键 Ctrl+Shift+R 可快速打开评估报告');
+        console.log('🔑 报告密码: admin123');
+    </script>
+</body>
+</html>
