@@ -7,7 +7,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
     </script>
     <style>
-        /* 样式与之前完全一致，为节省篇幅此处省略，实际请保留完整样式 */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -912,7 +911,6 @@
         // 条件显示 + 提交验证
         // =============================================================
         document.addEventListener('DOMContentLoaded', function() {
-            // 处理 radio 选项（显示/隐藏案例框）
             document.querySelectorAll('.options input[type="radio"]').forEach(function(radio) {
                 radio.addEventListener('change', function() {
                     const optionsDiv = this.closest('.options');
@@ -927,7 +925,6 @@
                 });
             });
 
-            // 处理 7.3 和 7.4 的 checkbox 联动
             document.querySelectorAll('.options input[type="checkbox"][data-target]').forEach(function(checkbox) {
                 checkbox.addEventListener('change', function() {
                     const targetId = this.dataset.target;
@@ -950,26 +947,22 @@
             for (let n of radioNames) { if (!document.querySelector(`input[name="${n}"]:checked`)) { alert(
                         '请完成所有选择题后再提交。'); return; } }
 
-            // 可见案例（radio触发的）
             document.querySelectorAll('.sub-q.show').forEach(function(subQ) {
                 const ta = subQ.querySelector('textarea');
                 if (ta && ta.value.trim() === '') { subQ.querySelector('.required-hint').classList.add('show'); } else { subQ
                         .querySelector('.required-hint').classList.remove('show'); }
             });
 
-            // 固定开放题
             const fixed = ['q1_4', 'q2_4', 'q7_5'];
             for (let f of fixed) { if (document.querySelector(`[name="${f}"]`).value.trim() === '') { alert(
                         '请完成所有必填的案例说明后再提交。'); return; } }
 
-            // 检查 7.3 其他框
             const q7_3_other = document.querySelector('input[name="q7_3"][value="其他促进"]');
             if (q7_3_other && q7_3_other.checked) {
                 const val = document.querySelector('[name="q7_3_other"]').value.trim();
                 if (val === '') { alert('请填写“其他”促进因素的具体内容。'); return; }
             }
 
-            // 检查 7.4 其他框
             const q7_4_other = document.querySelector('input[name="q7_4"][value="其他阻碍"]');
             if (q7_4_other && q7_4_other.checked) {
                 const val = document.querySelector('[name="q7_4_other"]').value.trim();
@@ -1031,14 +1024,13 @@
                 q7_5: getTextValue('q7_5'),
             };
             saveResponse(resp);
-
             document.getElementById('pageSurvey').classList.add('hidden');
             document.getElementById('pageSuccess').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // =============================================================
-        // 评估逻辑（已修复：增加 passed 和 total 字段）
+        // 评估逻辑
         // =============================================================
         function evaluateResponse(resp) {
             const results = {};
@@ -1061,6 +1053,13 @@
             else if (levelCount['优秀'] + levelCount['良好'] >= 8) overall = '良好';
             else if (levelCount['优秀'] + levelCount['良好'] + levelCount['达标'] >= 5) overall = '达标';
             return { results, levelCount, overall, passed, total };
+        }
+
+        function getRating(levelCount) {
+            if (levelCount['优秀'] >= 12) return { label: '优秀', cls: 'excellent' };
+            if (levelCount['优秀'] + levelCount['良好'] >= 8) return { label: '良好', cls: 'good' };
+            if (levelCount['优秀'] + levelCount['良好'] + levelCount['达标'] >= 5) return { label: '达标', cls: 'pass' };
+            return { label: '待提升', cls: 'fail' };
         }
 
         // =============================================================
@@ -1142,9 +1141,13 @@
             }
             html += `</tbody></table></div>`;
 
-            html += `<div style="font-size:16px;font-weight:600;margin:20px 0 8px 0;">学员明细</div><div class="report-table-wrap"><table class="report-table"><thead><tr><th>#</th><th>地区</th><th>提交时间</th>`;
-            for (let id of INDICATOR_IDS) html += `<th style="font-size:10px;">${id}</th>`;
-            html += `<th>达成数</th><th>综合评级</th></tr></thead><tbody>`;
+            // 学员明细（增加下载按钮）
+            html += `<div style="font-size:16px;font-weight:600;margin:20px 0 8px 0;">学员明细</div>`;
+            html += `<div class="report-table-wrap"><table class="report-table"><thead><tr><th>#</th><th>地区</th><th>提交时间</th>`;
+            for (let id of INDICATOR_IDS) {
+                html += `<th style="font-size:10px;">${id}</th>`;
+            }
+            html += `<th>达成数</th><th>综合评级</th><th>操作</th></tr></thead><tbody>`;
             data.forEach((resp, idx) => {
                 const ev = evaluateResponse(resp);
                 const rating = getRating(ev.levelCount);
@@ -1156,22 +1159,139 @@
                     html += `<td style="font-size:11px;">${emoji}${level}</td>`;
                 }
                 html += `<td><strong>${ev.passed}/${ev.total}</strong></td>`;
-                html += `<td><span class="rating-badge ${rating.cls}">${rating.label}</span></td></tr>`;
+                html += `<td><span class="rating-badge ${rating.cls}">${rating.label}</span></td>`;
+                html += `<td><button class="btn btn-primary" style="padding:4px 8px;font-size:12px;background:#1a73e8;color:#fff;border:none;border-radius:4px;cursor:pointer;" onclick="downloadSingleReport(${idx})">📥 下载</button></td>`;
+                html += `</tr>`;
             });
             html += `</tbody></table></div>`;
+
+            // 综合自评汇总
+            html += `<div style="font-size:16px;font-weight:600;margin:20px 0 8px 0;">综合自评汇总</div>`;
+            const q7_1_stats = {},
+                q7_2_stats = {};
+            const q7_3_all = [],
+                q7_4_all = [];
+            for (let resp of data) {
+                q7_1_stats[resp.q7_1] = (q7_1_stats[resp.q7_1] || 0) + 1;
+                q7_2_stats[resp.q7_2] = (q7_2_stats[resp.q7_2] || 0) + 1;
+                if (resp.q7_3) resp.q7_3.forEach(v => q7_3_all.push(v));
+                if (resp.q7_4) resp.q7_4.forEach(v => q7_4_all.push(v));
+            }
+            html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">`;
+            html += `<div style="background:#f8faff;padding:12px 16px;border-radius:10px;">
+                <div style="font-weight:500;font-size:14px;">培训影响自评</div>
+                ${Object.entries(q7_1_stats).map(([k,v]) => `<div>${k}: ${v}人</div>`).join('')}
+            </div>`;
+            html += `<div style="background:#f8faff;padding:12px 16px;border-radius:10px;">
+                <div style="font-weight:500;font-size:14px;">转化率自评</div>
+                ${Object.entries(q7_2_stats).map(([k,v]) => `<div>${k}: ${v}人</div>`).join('')}
+            </div>`;
+            html += `</div>`;
+            html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;">`;
+            html += `<div style="background:#f8faff;padding:12px 16px;border-radius:10px;">
+                <div style="font-weight:500;font-size:14px;">促进因素 TOP3</div>
+                ${Object.entries(q7_3_all.reduce((acc,v)=>{acc[v]=(acc[v]||0)+1;return acc;},{})).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v]) => `<div>${k}: ${v}人</div>`).join('') || '暂无数据'}
+            </div>`;
+            html += `<div style="background:#f8faff;padding:12px 16px;border-radius:10px;">
+                <div style="font-weight:500;font-size:14px;">阻碍因素 TOP3</div>
+                ${Object.entries(q7_4_all.reduce((acc,v)=>{acc[v]=(acc[v]||0)+1;return acc;},{})).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v]) => `<div>${k}: ${v}人</div>`).join('') || '暂无数据'}
+            </div>`;
+            html += `</div>`;
 
             document.getElementById('reportContent').innerHTML = html;
         }
 
-        function getRating(levelCount) {
-            if (levelCount['优秀'] >= 12) return { label: '优秀', cls: 'excellent' };
-            if (levelCount['优秀'] + levelCount['良好'] >= 8) return { label: '良好', cls: 'good' };
-            if (levelCount['优秀'] + levelCount['良好'] + levelCount['达标'] >= 5) return { label: '达标', cls: 'pass' };
-            return { label: '待提升', cls: 'fail' };
+        // =============================================================
+        // 下载单个学员报告
+        // =============================================================
+        function downloadSingleReport(index) {
+            const data = getResponses();
+            if (!data[index]) {
+                alert('学员数据不存在');
+                return;
+            }
+            const resp = data[index];
+            const ev = evaluateResponse(resp);
+            const rating = getRating(ev.levelCount);
+
+            const dimQuestions = {
+                '理解变化': [
+                    { label: '1.1 主动运用战略概念', key: 'q1_1', example: 'q1_1_example' },
+                    { label: '1.2 战略理解变化', key: 'q1_2', example: 'q1_2_example' },
+                    { label: '1.3 跨文化心态变化', key: 'q1_3', example: 'q1_3_example' },
+                    { label: '1.4 理解变化案例', key: 'q1_4', example: null }
+                ],
+                '行为变化': [
+                    { label: '2.1 沟通方式调整', key: 'q2_1', example: 'q2_1_example' },
+                    { label: '2.2 跨地区联系建立', key: 'q2_2', example: 'q2_2_example' },
+                    { label: '2.3 跨文化协调承担', key: 'q2_3', example: 'q2_3_example' },
+                    { label: '2.4 行为变化案例', key: 'q2_4', example: null }
+                ],
+                '工作产出': [
+                    { label: '3.1 新方法应用', key: 'q3_1', example: 'q3_1_example' },
+                    { label: '3.2 改进建议提出', key: 'q3_2', example: 'q3_2_example' },
+                    { label: '3.3 内部分享', key: 'q3_3', example: 'q3_3_example' },
+                    { label: '3.4 跨文化任务效率', key: 'q3_4', example: 'q3_4_example' }
+                ],
+                '人际网络': [
+                    { label: '4.1 人脉帮助获取', key: 'q4_1', example: 'q4_1_example' },
+                    { label: '4.2 工作协同', key: 'q4_2', example: 'q4_2_example' },
+                    { label: '4.3 同事帮助支持', key: 'q4_3', example: 'q4_3_example' }
+                ],
+                '语言能力': [
+                    { label: '5.1 语言学习持续', key: 'q5_1', example: 'q5_1_example' },
+                    { label: '5.2 跨文化表现变化', key: 'q5_2', example: 'q5_2_example' },
+                    { label: '5.3 语言水平提升', key: 'q5_3', example: 'q5_3_example' }
+                ],
+                '归属感': [
+                    { label: '6.1 归属感变化', key: 'q6_1', example: 'q6_1_example' },
+                    { label: '6.2 进阶培训意愿', key: 'q6_2', example: null },
+                    { label: '6.3 国际化意愿', key: 'q6_3', example: 'q6_3_example' }
+                ]
+            };
+
+            const wb = XLSX.utils.book_new();
+            const infoRows = [
+                ['学员评估报告'],
+                ['序号', index + 1],
+                ['地区', resp.region || '未选择'],
+                ['提交时间', new Date(resp.timestamp).toLocaleString('zh-CN')],
+                ['达成数', `${ev.passed}/${ev.total}`],
+                ['综合评级', rating.label],
+                []
+            ];
+
+            for (let dim of DIM_ORDER) {
+                const qs = dimQuestions[dim];
+                infoRows.push([dim, '', '', '']);
+                infoRows.push(['题目', '答案', '案例', '等级']);
+                for (let q of qs) {
+                    const ans = resp[q.key] || '';
+                    const example = q.example ? (resp[q.example] || '') : '';
+                    const level = ev.results[Object.keys(INDICATORS).find(id => INDICATORS[id].q === q.key)] || '待提升';
+                    infoRows.push([q.label, ans, example, level]);
+                }
+                infoRows.push([]);
+            }
+
+            infoRows.push(['综合自评']);
+            infoRows.push(['7.1 培训影响', resp.q7_1 || '']);
+            infoRows.push(['7.2 转化率', resp.q7_2 || '']);
+            infoRows.push(['7.3 促进因素', (resp.q7_3 || []).join('、')]);
+            infoRows.push(['7.4 阻碍因素', (resp.q7_4 || []).join('、')]);
+            infoRows.push(['7.5 后续建议', resp.q7_5 || '']);
+
+            const ws = XLSX.utils.aoa_to_sheet(infoRows);
+            ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 30 }, { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, ws, '评估报告');
+
+            const region = resp.region || '未知地区';
+            const filename = `学员${index+1}_${region}_评估报告.xlsx`;
+            XLSX.writeFile(wb, filename);
         }
 
         // =============================================================
-        // 下载 Excel（导出每个学员的详细评估状况）
+        // 全局下载 Excel（所有学员汇总）
         // =============================================================
         function downloadExcel() {
             const data = getResponses();
@@ -1213,15 +1333,14 @@
                 ]
             };
 
-            // 构建表头
             const header1 = ['序号', '地区', '提交时间'];
             const colSpan = {};
             for (let dim of DIM_ORDER) {
                 const qs = dimQuestions[dim];
                 let count = 0;
                 for (let q of qs) {
-                    count += 2; // 答案 + 等级
-                    if (q.example) count += 1; // 案例
+                    count += 2;
+                    if (q.example) count += 1;
                 }
                 colSpan[dim] = count;
                 for (let i = 0; i < count; i++) {
@@ -1241,7 +1360,6 @@
 
             const rows = [header1, header2];
             data.forEach((resp, idx) => {
-                const ev = evaluateResponse(resp);
                 const row = [idx + 1, resp.region || '未选择', new Date(resp.timestamp).toLocaleString('zh-CN')];
                 for (let dim of DIM_ORDER) {
                     const qs = dimQuestions[dim];
@@ -1283,7 +1401,7 @@
         }
 
         // =============================================================
-        // 生成打印报告
+        // 生成打印报告（略，保持完整）
         // =============================================================
         function generatePrintableReport() {
             const data = getResponses();
@@ -1317,6 +1435,8 @@
                 dimStats[ind.dim].total += s.total;
             }
 
+            // 由于篇幅，此处生成HTML用于打印，直接调用之前已写好的逻辑，省略但保留功能
+            // 实际代码中完整保留 generatePrintableReport 函数
             let html = `
             <html><head><meta charset="UTF-8"><title>山海计划评估报告</title>
             <style>body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding:30px;max-width:1100px;margin:auto;}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:16px 0;}.stat-card{background:#f5f8fe;border-radius:10px;padding:14px;text-align:center;}.stat-card .num{font-size:28px;font-weight:700;color:#1a73e8;}.stat-card .label{font-size:13px;color:#6b7a8f;}.stat-card.green .num{color:#2a7d4f;}.stat-card.orange .num{color:#e67e22;}.stat-card.red .num{color:#c62828;}h2{font-size:20px;margin:30px 0 14px;border-left:4px solid #1a73e8;padding-left:12px;}.dim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:12px 0;}.dim-card{background:#f8faff;border-radius:10px;padding:12px;text-align:center;border:1px solid #eef2f7;}.dim-card .dim-name{font-size:13px;color:#6b7a8f;}.dim-card .dim-rate{font-size:24px;font-weight:700;color:#0a2540;}table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}th{background:#1a2b3c;color:#fff;padding:8px 10px;text-align:center;}td{padding:6px 10px;border-bottom:1px solid #eaeef5;text-align:center;}.dim-label{text-align:left;font-weight:500;}.ind-label{text-align:left;padding-left:20px;}.badge{display:inline-block;padding:2px 14px;border-radius:12px;font-size:12px;font-weight:600;}.badge.done{background:#e6f7e6;color:#2a7d4f;}.badge.partial{background:#e8f0fe;color:#1a5a9c;}.badge.fail{background:#fee9e7;color:#c62828;}.rating{display:inline-block;padding:3px 16px;border-radius:20px;font-weight:700;font-size:13px;}.rating.excellent{background:#e6f7e6;color:#2a7d4f;}.rating.good{background:#e8f0fe;color:#1a5a9c;}.rating.pass{background:#fff3e0;color:#b76e1e;}.rating.fail{background:#fee9e7;color:#c62828;}.footer{margin-top:30px;text-align:center;font-size:13px;color:#6b7a8f;border-top:1px solid #e9edf4;padding-top:16px;}
